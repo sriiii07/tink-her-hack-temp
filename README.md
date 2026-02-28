@@ -50,10 +50,10 @@ UrbanFlow provides information about real-time traffic conditions, fastest route
 ## Features
 
 List the key features of your project:
-- Feature 1: [Description]
-- Feature 2: [Description]
-- Feature 3: [Description]
-- Feature 4: [Description]
+- Feature 1: Realtime Location mapping and sharing of user to close individuals for safety
+- Feature 2: Nearest parking space information
+- Feature 3: AI-based route optimization
+- Feature 4: Instant incident alerts
 
 ---
 
