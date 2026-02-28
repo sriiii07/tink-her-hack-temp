@@ -13,7 +13,7 @@
 - Member 2: A Srilaxmi - Ahalia School Of Engineering and Technology
 
 ### Hosted Project Link
-[mention your project hosted link here]
+https://tink-her-hack-temp-drab.vercel.app/
 
 ### Project Description
 Urbanflow is an AI mobility platform that helps users with all the traffic related problems including informations about the highest level of traffic, easiest route to go from current location to destination etc. It is also available with a walk mode which helps users track their steps etc, nearest parking area information, real time AI event feed which gives the latest updates about signals nearby and provide the best route possible. 
