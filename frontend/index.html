@@ -1,0 +1,1276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>URBANFLOW — AI Smart Urban Mobility</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;600;700&family=Share+Tech+Mono&family=Exo+2:wght@200;400;700;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#030a12;--s1:#0b111a;--s2:#111820;--border:#1e2a38;--accent:#00d8ff;--a2:#7c3aed;--green:#00ffaa;--yellow:#ffd60a;--red:#ff3054;--orange:#ff7b39;--text:#ddeeff;--muted:#5a7a99;--purple:#a78bfa}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9500;background:repeating-linear-gradient(180deg,transparent,transparent 3px,rgba(0,0,0,.035) 3px,rgba(0,0,0,.035) 4px)}
+
+/* ══ SPLASH ══════════════════════════════════════════ */
+#splash{position:fixed;inset:0;z-index:9000;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;transition:opacity .9s ease}
+#splash.hide{opacity:0;pointer-events:none;display:none!important}
+.hexbg{position:absolute;inset:0;opacity:.055;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='86'%3E%3Cpolygon points='50,2 97,27 97,72 50,97 3,72 3,27' fill='none' stroke='%2300d8ff' stroke-width='1'/%3E%3C/svg%3E");background-size:80px 70px}
+.radar{position:absolute;border-radius:50%;border:1px solid rgba(0,216,255,.09);animation:rp 4s ease-in-out infinite}
+.r1{width:420px;height:420px}.r2{width:700px;height:700px;animation-delay:.9s}.r3{width:1000px;height:1000px;animation-delay:1.8s}
+@keyframes rp{0%,100%{border-color:rgba(0,216,255,.09)}50%{border-color:rgba(0,216,255,.32)}}
+.sweep{position:absolute;width:260px;height:260px;background:conic-gradient(from 0deg,transparent 320deg,rgba(0,216,255,.55) 360deg);border-radius:50%;animation:sw 3s linear infinite}
+@keyframes sw{to{transform:rotate(360deg)}}
+#sparks{position:absolute;inset:0;pointer-events:none}
+.swrap{position:relative;z-index:2;text-align:center;display:flex;flex-direction:column;align-items:center}
+.shex{width:100px;height:100px;margin-bottom:22px;background:linear-gradient(135deg,rgba(0,216,255,.18),rgba(124,58,237,.3));clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);display:flex;align-items:center;justify-content:center;font-size:40px;animation:hg 2.5s ease-in-out infinite}
+@keyframes hg{0%,100%{box-shadow:0 0 28px rgba(0,216,255,.28)}50%{box-shadow:0 0 65px rgba(0,216,255,.7)}}
+.stitle{font-family:'Exo 2',sans-serif;font-weight:900;font-size:clamp(52px,8.5vw,90px);letter-spacing:13px;background:linear-gradient(90deg,#00d8ff,#7c3aed,#00ffaa,#00d8ff);background-size:300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:gs 4s linear infinite,sr 1.2s cubic-bezier(.16,1,.3,1) both .3s}
+@keyframes gs{0%{background-position:0%}100%{background-position:300%}}
+@keyframes sr{from{opacity:0;transform:translateY(26px) scale(.94)}to{opacity:1;transform:none}}
+.ssub{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:5px;color:var(--accent);margin-top:9px;opacity:0;animation:fu .8s ease both .9s}
+.stag{margin-top:14px;font-size:13px;color:var(--muted);letter-spacing:2px;opacity:0;animation:fu .8s ease both 1.3s}
+@keyframes fu{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.sfeats{display:flex;gap:18px;margin-top:20px;opacity:0;animation:fu .8s ease both 1.6s;flex-wrap:wrap;justify-content:center}
+.sf{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:2px;display:flex;align-items:center;gap:5px}
+.sf::before{content:'◈';color:var(--accent)}
+.sbtnrow{display:flex;gap:14px;margin-top:34px;opacity:0;animation:fu .8s ease both 2s;flex-wrap:wrap;justify-content:center}
+.sbtn{padding:12px 32px;font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:3px;cursor:pointer;position:relative;overflow:hidden;transition:all .3s;border-radius:2px}
+.sbtn-p{background:transparent;border:1px solid var(--accent);color:var(--accent)}
+.sbtn-p::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(0,216,255,.15),transparent);transform:translateX(-100%);transition:transform .5s}
+.sbtn-p:hover::before{transform:translateX(100%)}
+.sbtn-p:hover{background:rgba(0,216,255,.1);box-shadow:0 0 22px rgba(0,216,255,.4)}
+.sbtn-g{background:transparent;border:1px solid var(--muted);color:var(--muted)}
+.sbtn-g:hover{border-color:var(--text);color:var(--text);background:rgba(255,255,255,.04)}
+.sbar{position:absolute;bottom:0;left:0;height:2px;width:0;background:linear-gradient(90deg,var(--accent),var(--a2),var(--green));transition:width 5s ease}
+
+/* ══ AUTH PAGE (replaces splash after click) ════════ */
+#authPage{position:fixed;inset:0;z-index:8800;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:center;overflow:hidden}
+#authPage.open{display:flex}
+#authPage .hexbg{opacity:.04}
+.auth-box{position:relative;z-index:2;width:420px;background:var(--s1);border:1px solid var(--border);border-radius:4px;padding:36px 40px;box-shadow:0 0 80px rgba(0,0,0,.9)}
+.auth-box::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--a2),var(--green))}
+.auth-logo{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.auth-hex{width:32px;height:32px;background:linear-gradient(135deg,var(--accent),var(--a2));clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);display:flex;align-items:center;justify-content:center;font-size:14px}
+.auth-title{font-family:'Exo 2',sans-serif;font-weight:900;font-size:22px;letter-spacing:4px}
+.auth-title em{color:var(--accent);font-style:normal}
+.auth-sub{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--muted);margin-bottom:26px}
+.auth-tabs{display:flex;border:1px solid var(--border);margin-bottom:24px}
+.atab{flex:1;padding:10px;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;cursor:pointer;text-align:center;background:var(--s2);color:var(--muted);transition:all .25s;border:none}
+.atab.active{background:rgba(0,216,255,.1);color:var(--accent);border-bottom:2px solid var(--accent)}
+.fg{margin-bottom:14px}
+.fl{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--muted);margin-bottom:5px;display:block}
+.fi{width:100%;background:var(--s2);border:1px solid var(--border);padding:10px 13px;color:var(--text);font-family:'Share Tech Mono',monospace;font-size:11px;outline:none;transition:border-color .25s;border-radius:2px}
+.fi:focus{border-color:var(--accent)}
+.fi::placeholder{color:var(--muted)}
+.aerr{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--red);margin-bottom:10px;min-height:16px}
+.aok{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--green);margin-bottom:10px;min-height:16px}
+.abtn{width:100%;padding:12px;background:linear-gradient(90deg,rgba(0,216,255,.12),rgba(124,58,237,.12));border:1px solid var(--accent);color:var(--accent);font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:3px;cursor:pointer;transition:all .3s;border-radius:2px;margin-bottom:8px}
+.abtn:hover{background:rgba(0,216,255,.2);box-shadow:0 0 16px rgba(0,216,255,.3)}
+.abtn-ghost{background:transparent;border-color:var(--muted);color:var(--muted)}
+.abtn-ghost:hover{border-color:var(--text);color:var(--text);box-shadow:none}
+.auth-back{position:absolute;top:16px;right:18px;background:none;border:none;color:var(--muted);cursor:pointer;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:1px;transition:color .2s}
+.auth-back:hover{color:var(--accent)}
+
+/* ══ APP GRID ════════════════════════════════════════ */
+#app{display:grid;grid-template-rows:54px 1fr 22px;grid-template-columns:255px 1fr 270px;height:100vh;opacity:0;transition:opacity .8s ease}
+#app.visible{opacity:1}
+header{grid-column:1/-1;background:linear-gradient(90deg,#060d16,#0a1220,#060d16);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 15px;position:relative;overflow:hidden}
+header::after{content:'';position:absolute;bottom:0;left:-100%;right:-100%;height:1px;background:linear-gradient(90deg,transparent,var(--accent),var(--a2),transparent);animation:hs 4s linear infinite}
+@keyframes hs{from{transform:translateX(-30%)}to{transform:translateX(100%)}}
+.logo{display:flex;align-items:center;gap:9px;cursor:pointer}
+.lhex{width:30px;height:30px;background:linear-gradient(135deg,var(--accent),var(--a2));clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);display:flex;align-items:center;justify-content:center;font-size:13px;animation:hg 3s ease-in-out infinite}
+.ltxt{font-family:'Exo 2',sans-serif;font-weight:900;font-size:18px;letter-spacing:3px}
+.ltxt em{color:var(--accent);font-style:normal}
+.lsub{font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--muted);letter-spacing:2px;margin-top:-2px;display:block}
+.hpills{display:flex;gap:6px;align-items:center}
+.pill{display:flex;align-items:center;gap:5px;padding:3px 9px;border:1px solid var(--border);background:var(--s2);font-family:'Share Tech Mono',monospace;font-size:9px;border-radius:2px;white-space:nowrap}
+.dot{width:6px;height:6px;border-radius:50%}
+.dg{background:var(--green);box-shadow:0 0 5px var(--green);animation:blink 1.5s infinite}
+.dy{background:var(--yellow);box-shadow:0 0 5px var(--yellow);animation:blink 2s infinite}
+.dr{background:var(--red);box-shadow:0 0 5px var(--red);animation:blink 1s infinite}
+.dp{background:var(--purple);box-shadow:0 0 5px var(--purple);animation:blink 1s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.hright{display:flex;align-items:center;gap:11px;font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--muted)}
+#hclock{color:var(--accent);font-size:13px;font-weight:bold}
+
+/* ══ LEFT PANEL ══════════════════════════════════════ */
+.lp{background:var(--s1);border-right:1px solid var(--border);overflow-y:auto;padding:11px;display:flex;flex-direction:column;gap:9px}
+.lp::-webkit-scrollbar,.rp::-webkit-scrollbar{width:2px}
+.lp::-webkit-scrollbar-thumb,.rp::-webkit-scrollbar-thumb{background:var(--a2)}
+.ptit{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--muted);padding-bottom:6px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:5px}
+.ptit::before{content:'//';color:var(--accent)}
+
+/* MODE GRID */
+.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:4px}
+.mbtn{padding:8px 4px;border:1px solid var(--border);background:var(--s2);border-radius:2px;cursor:pointer;text-align:center;transition:all .25s;font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;color:var(--muted);user-select:none}
+.mbtn .mi{font-size:15px;display:block;margin-bottom:2px;transition:transform .3s}
+.mbtn:hover{border-color:var(--accent);color:var(--text);transform:translateY(-1px)}
+.mbtn:hover .mi{transform:scale(1.15)}
+.mbtn.active{border-color:var(--accent);color:var(--accent);background:linear-gradient(135deg,rgba(0,216,255,.1),rgba(124,58,237,.1));box-shadow:0 0 12px rgba(0,216,255,.15)}
+
+/* SCORE RING */
+.sring{display:flex;flex-direction:column;align-items:center;padding:6px 0}
+.rwrap{position:relative;width:88px;height:88px}
+.rsvg{transform:rotate(-90deg)}
+.rbg{fill:none;stroke:var(--border);stroke-width:7}
+.rfil{fill:none;stroke-width:7;stroke-linecap:round;transition:stroke-dashoffset .9s ease,stroke .5s}
+.rlbl{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+#rscore{font-family:'Exo 2',sans-serif;font-weight:900;font-size:22px;transition:color .5s}
+.rsub{font-family:'Share Tech Mono',monospace;font-size:7px;color:var(--muted)}
+#rstat{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:2px;color:var(--muted);margin-top:4px}
+
+/* ZONES */
+.zitem{display:flex;align-items:center;justify-content:space-between;padding:6px 8px;border:1px solid var(--border);border-radius:2px;background:var(--s2);cursor:pointer;transition:all .2s;font-size:11px;margin-bottom:3px}
+.zitem:hover{border-color:var(--accent);transform:translateX(3px)}
+.zitem.sel{border-color:var(--accent);background:rgba(0,216,255,.07)}
+.zb{padding:2px 6px;border-radius:1px;font-size:8px;font-family:'Share Tech Mono',monospace;font-weight:700;letter-spacing:1px}
+.bl{background:rgba(0,255,170,.12);color:var(--green);border:1px solid rgba(0,255,170,.3)}
+.bm{background:rgba(255,214,10,.12);color:var(--yellow);border:1px solid rgba(255,214,10,.3)}
+.bh{background:rgba(255,48,84,.12);color:var(--red);border:1px solid rgba(255,48,84,.3)}
+
+/* PARKING */
+.park-btn{width:100%;padding:8px;background:transparent;border:1px solid var(--green);color:var(--green);font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;cursor:pointer;border-radius:2px;transition:all .25s}
+.park-btn:hover{background:rgba(0,255,170,.1);box-shadow:0 0 10px rgba(0,255,170,.2)}
+.park-btn:disabled{border-color:var(--muted);color:var(--muted);cursor:not-allowed;opacity:.6}
+.park-list{display:flex;flex-direction:column;gap:4px;max-height:170px;overflow-y:auto}
+.park-list::-webkit-scrollbar{width:2px}
+.park-list::-webkit-scrollbar-thumb{background:var(--a2)}
+.pitem{padding:7px 8px;border:1px solid var(--border);border-radius:2px;background:var(--s2);cursor:pointer;transition:all .2s;font-size:11px}
+.pitem:hover{border-color:var(--purple)}
+.pitem.psel{border-color:var(--green);background:rgba(0,255,170,.05)}
+.pname{font-weight:700;color:var(--text);font-size:11px}
+.pdist{font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--accent);margin-top:1px}
+.prow{display:flex;justify-content:space-between;align-items:center}
+
+/* STEP MODE */
+.step-btn{width:100%;padding:9px;border:1px solid var(--purple);color:var(--purple);background:transparent;font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;cursor:pointer;border-radius:2px;transition:all .3s;position:relative;overflow:hidden}
+.step-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(167,139,250,.12),transparent);transform:translateX(-100%);transition:transform .6s}
+.step-btn:hover::before{transform:translateX(100%)}
+.step-btn:hover{background:rgba(167,139,250,.08);box-shadow:0 0 14px rgba(167,139,250,.3)}
+.step-btn.active-step{border-color:var(--green);color:var(--green);background:rgba(0,255,170,.08);animation:stepglow 1.5s ease-in-out infinite}
+@keyframes stepglow{0%,100%{box-shadow:0 0 8px rgba(0,255,170,.3)}50%{box-shadow:0 0 20px rgba(0,255,170,.6)}}
+.step-panel{display:none;flex-direction:column;gap:6px;padding:10px;background:var(--s2);border:1px solid var(--border);border-radius:2px;border-left:2px solid var(--purple)}
+.step-panel.open{display:flex}
+.step-counter{text-align:center;padding:10px 0}
+.step-num{font-family:'Exo 2',sans-serif;font-weight:900;font-size:36px;color:var(--purple);animation:scpulse 1s ease-in-out infinite}
+@keyframes scpulse{0%,100%{opacity:.7}50%{opacity:1}}
+.step-lbl{font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--muted);letter-spacing:2px;margin-top:2px}
+.step-dist{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--accent);margin-top:4px}
+.step-pgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px}
+.spbtn{padding:6px 3px;border:1px solid var(--border);background:var(--s2);border-radius:2px;cursor:pointer;text-align:center;font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--muted);transition:all .25s;letter-spacing:1px}
+.spbtn:hover{border-color:var(--purple);color:var(--purple)}
+.spbtn.sp-active{border-color:var(--purple);color:var(--purple);background:rgba(167,139,250,.1)}
+.contacts-section{display:flex;flex-direction:column;gap:5px}
+.contact-input-wrap{display:flex;gap:4px}
+.contact-input{flex:1;background:var(--s2);border:1px solid var(--border);padding:6px 8px;color:var(--text);font-family:'Share Tech Mono',monospace;font-size:9px;outline:none;border-radius:2px;transition:border-color .25s}
+.contact-input:focus{border-color:var(--purple)}
+.contact-input::placeholder{color:var(--muted)}
+.contact-add-btn{padding:6px 8px;background:transparent;border:1px solid var(--purple);color:var(--purple);font-family:'Share Tech Mono',monospace;font-size:9px;cursor:pointer;border-radius:2px;transition:all .25s}
+.contact-add-btn:hover{background:rgba(167,139,250,.1)}
+.contact-tag{display:flex;align-items:center;justify-content:space-between;padding:4px 8px;background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.3);border-radius:2px;font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--purple)}
+.contact-tag button{background:none;border:none;color:var(--muted);cursor:pointer;font-size:11px;line-height:1;padding:0 2px}
+.contact-tag button:hover{color:var(--red)}
+.send-loc-btn{width:100%;padding:7px;background:rgba(167,139,250,.1);border:1px solid var(--purple);color:var(--purple);font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:1px;cursor:pointer;border-radius:2px;transition:all .3s}
+.send-loc-btn:hover{background:rgba(167,139,250,.2);box-shadow:0 0 12px rgba(167,139,250,.3)}
+.send-loc-btn:disabled{opacity:.4;cursor:not-allowed}
+
+.sep{height:1px;background:var(--border);flex-shrink:0}
+
+/* ══ MAP ════════════════════════════════════════════ */
+.mapa{position:relative;overflow:hidden}
+#map{width:100%;height:100%;z-index:1}
+/* Dark map tiles */
+.leaflet-tile-pane{filter:brightness(.55) saturate(.3) hue-rotate(185deg) invert(1)}
+.mhud{position:absolute;top:11px;left:11px;right:11px;display:flex;justify-content:space-between;pointer-events:none;z-index:500;gap:6px}
+.hbadge{background:rgba(6,13,22,.92);border:1px solid var(--border);padding:6px 11px;backdrop-filter:blur(10px);font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;border-radius:2px;white-space:nowrap}
+.rbar{position:absolute;bottom:0;left:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--a2));z-index:500;transition:width .08s linear}
+.mleg{position:absolute;bottom:11px;left:11px;background:rgba(6,13,22,.92);border:1px solid var(--border);padding:8px 11px;backdrop-filter:blur(10px);border-radius:2px;z-index:500}
+.lrow{display:flex;align-items:center;gap:6px;font-family:'Share Tech Mono',monospace;font-size:8px;margin-bottom:3px;color:var(--muted)}
+.lline{width:18px;height:3px;border-radius:2px}
+.etab{position:absolute;bottom:11px;right:11px;background:rgba(6,13,22,.93);border:1px solid var(--border);padding:10px 13px;backdrop-filter:blur(10px);border-radius:2px;z-index:500;min-width:150px}
+.elbl{font-family:'Share Tech Mono',monospace;font-size:8px;letter-spacing:2px;color:var(--muted);margin-bottom:2px}
+.enum{font-family:'Exo 2',sans-serif;font-weight:900;font-size:26px}
+.enum span{font-size:12px;color:var(--muted)}
+.esub{font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--muted);margin-top:2px}
+.edel{font-family:'Exo 2',sans-serif;font-weight:700;font-size:16px;color:var(--green);margin-top:4px;transition:color .4s}
+/* Destination prompt banner */
+#destPrompt{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:600;background:rgba(6,13,22,.95);border:1px solid var(--accent);padding:14px 24px;text-align:center;border-radius:3px;pointer-events:none;backdrop-filter:blur(12px);animation:promptpulse 2s ease-in-out infinite}
+@keyframes promptpulse{0%,100%{box-shadow:0 0 12px rgba(0,216,255,.3)}50%{box-shadow:0 0 28px rgba(0,216,255,.6)}}
+#destPrompt h3{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:3px;color:var(--accent);margin-bottom:4px}
+#destPrompt p{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:1px}
+/* Change destination button */
+#changeDestBtn{position:absolute;top:52px;right:11px;z-index:500;background:rgba(6,13,22,.92);border:1px solid var(--yellow);color:var(--yellow);padding:5px 10px;font-family:'Share Tech Mono',monospace;font-size:9px;cursor:pointer;border-radius:2px;letter-spacing:1px;transition:all .25s;display:none}
+#changeDestBtn:hover{background:rgba(255,214,10,.1);box-shadow:0 0 12px rgba(255,214,10,.3)}
+#locLoad{position:absolute;inset:0;z-index:600;background:rgba(3,10,18,.75);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);flex-direction:column;gap:12px}
+#locLoad.hide{display:none}
+.lspin{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--accent);letter-spacing:3px;animation:lp 1.2s ease-in-out infinite}
+.lspin2{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:2px}
+@keyframes lp{0%,100%{opacity:.4}50%{opacity:1}}
+/* Map cursor when picking destination */
+#map.picking-dest{cursor:crosshair!important}
+
+/* ══ RIGHT PANEL ════════════════════════════════════ */
+.rp{background:var(--s1);border-left:1px solid var(--border);overflow-y:auto;padding:11px;display:flex;flex-direction:column;gap:9px}
+.sigrow{display:flex;align-items:center;gap:7px;padding:5px 8px;background:var(--s2);border:1px solid var(--border);border-radius:2px;transition:border-color .3s}
+.sigrow:hover{border-color:var(--accent)}
+.sigl{width:8px;height:8px;border-radius:50%;flex-shrink:0;transition:background .5s,box-shadow .5s}
+.sigbw{flex:1;height:3px;background:var(--border);border-radius:2px;overflow:hidden}
+.sigbf{height:100%;border-radius:2px;transition:width 1s ease}
+.sigt{font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--muted);min-width:24px;text-align:right}
+.afd{display:flex;flex-direction:column;gap:4px;max-height:220px;overflow-y:auto}
+.afd::-webkit-scrollbar{width:2px}
+.afd::-webkit-scrollbar-thumb{background:var(--a2)}
+.aev{padding:5px 8px;border-left:2px solid;border-radius:0 2px 2px 0;background:var(--s2);font-size:10px;animation:slin .3s ease}
+@keyframes slin{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:none}}
+.aev-c{border-color:var(--red)}.aev-w{border-color:var(--yellow)}.aev-i{border-color:var(--accent)}.aev-s{border-color:var(--green)}
+.aeh{display:flex;justify-content:space-between;margin-bottom:2px}
+.aet{font-weight:700;font-size:8px;font-family:'Share Tech Mono',monospace;letter-spacing:1px}
+.aets{font-family:'Share Tech Mono',monospace;color:var(--muted);font-size:8px}
+.crow{display:flex;gap:4px}
+.cb{flex:1;padding:6px;border:1px solid var(--border);background:var(--s2);font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--muted);cursor:pointer;text-align:center;transition:all .25s;letter-spacing:1px;border-radius:2px}
+.cb:hover{border-color:var(--accent);color:var(--accent)}
+.cb.on{border-color:var(--green);color:var(--green);background:rgba(0,255,170,.07)}
+.cb.off{border-color:var(--red);color:var(--red);background:rgba(255,48,84,.07)}
+
+/* ══ TICKER ════════════════════════════════════════ */
+.tbar{grid-column:1/-1;background:var(--s1);border-top:1px solid var(--border);display:flex;align-items:center;overflow:hidden}
+.tlbl{padding:0 11px;background:var(--accent);color:var(--bg);height:100%;font-family:'Share Tech Mono',monospace;font-size:9px;font-weight:700;display:flex;align-items:center;flex-shrink:0;letter-spacing:2px}
+.tsc{overflow:hidden;flex:1}
+.ttr{display:flex;gap:50px;white-space:nowrap;font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--muted);animation:tsc 50s linear infinite}
+.ttr em{color:var(--accent);font-style:normal}
+@keyframes tsc{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ══ TOAST ════════════════════════════════════════ */
+#toast{position:fixed;top:65px;right:15px;z-index:9400;background:var(--s1);border:1px solid var(--border);border-left:3px solid var(--accent);padding:9px 14px;max-width:300px;border-radius:2px;font-family:'Share Tech Mono',monospace;font-size:10px;transform:translateX(130%);transition:transform .4s cubic-bezier(.16,1,.3,1);pointer-events:none;line-height:1.5}
+#toast.show{transform:translateX(0)}
+#toast.toast-warn{border-left-color:var(--yellow)}
+#toast.toast-ok{border-left-color:var(--green)}
+#toast.toast-step{border-left-color:var(--purple)}
+
+/* SMS MODAL */
+#smsModal{position:fixed;inset:0;z-index:9200;display:none;align-items:center;justify-content:center;background:rgba(3,10,18,.85);backdrop-filter:blur(12px)}
+#smsModal.open{display:flex}
+.sms-box{background:var(--s1);border:1px solid var(--purple);border-radius:3px;padding:28px 32px;width:380px;position:relative}
+.sms-box::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--purple),var(--accent))}
+.sms-title{font-family:'Exo 2',sans-serif;font-weight:700;font-size:16px;letter-spacing:3px;color:var(--purple);margin-bottom:4px}
+.sms-sub{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:2px;margin-bottom:20px}
+.sms-preview{background:var(--s2);border:1px solid var(--border);padding:12px;border-radius:2px;font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text);line-height:1.7;margin-bottom:16px;white-space:pre-wrap}
+.sms-close{position:absolute;top:12px;right:14px;background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px}
+.sms-close:hover{color:var(--text)}
+.sms-actions{display:flex;gap:8px}
+.sms-copy{flex:1;padding:10px;background:transparent;border:1px solid var(--purple);color:var(--purple);font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;cursor:pointer;border-radius:2px;transition:all .3s}
+.sms-copy:hover{background:rgba(167,139,250,.1)}
+.sms-wa{flex:1;padding:10px;background:rgba(0,200,80,.1);border:1px solid #00c850;color:#00c850;font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;cursor:pointer;border-radius:2px;transition:all .3s}
+.sms-wa:hover{background:rgba(0,200,80,.2)}
+
+/* Leaflet */
+.uf-popup .leaflet-popup-content-wrapper{background:rgba(11,17,26,.96)!important;border:1px solid var(--accent)!important;border-radius:3px!important;color:var(--text)!important;font-family:'Share Tech Mono',monospace!important;font-size:10px!important}
+.uf-popup .leaflet-popup-tip{background:rgba(11,17,26,.96)!important}
+.leaflet-control-zoom a{background:var(--s2)!important;border:1px solid var(--border)!important;color:var(--accent)!important}
+</style>
+</head>
+<body>
+
+<!-- ═══════════ SPLASH ═══════════ -->
+<div id="splash">
+  <div class="hexbg"></div>
+  <div class="radar r1"></div><div class="radar r2"></div><div class="radar r3"></div>
+  <div class="sweep"></div>
+  <canvas id="sparks"></canvas>
+  <div class="swrap">
+    <div class="shex">&#x1F6A6;</div>
+    <div class="stitle">URBANFLOW</div>
+    <div class="ssub">AI SMART URBAN MOBILITY INTELLIGENCE PLATFORM</div>
+    <div class="stag">Real-time Traffic &middot; Safety Routing &middot; Step Mode &middot; Parking Finder</div>
+    <div class="sfeats">
+      <div class="sf">LIVE MAP</div><div class="sf">AI ROUTING</div>
+      <div class="sf">STEP MODE</div><div class="sf">PARKING</div>
+    </div>
+    <div class="sbtnrow">
+      <button class="sbtn sbtn-p" onclick="showAuth()">&#x25C8; &nbsp;LOGIN / REGISTER&nbsp; &#x25C8;</button>
+      <button class="sbtn sbtn-g" onclick="enterAsGuest()">&#x27B6; &nbsp;GUEST ACCESS</button>
+    </div>
+  </div>
+  <div class="sbar" id="sbar"></div>
+</div>
+
+<!-- ═══════════ AUTH PAGE ═══════════ -->
+<div id="authPage">
+  <div class="hexbg"></div>
+  <div class="radar r1" style="opacity:.5"></div>
+  <div class="auth-box">
+    <button class="auth-back" onclick="hideAuth()">&#x2190; BACK</button>
+    <div class="auth-logo">
+      <div class="auth-hex">&#x1F6A6;</div>
+      <div class="auth-title">URBAN<em>FLOW</em></div>
+    </div>
+    <div class="auth-sub">// SECURE ACCESS PORTAL &mdash; CONNECTED TO BACKEND DB</div>
+    <div class="auth-tabs">
+      <button class="atab active" id="tab-li" onclick="switchTab('li')">LOGIN</button>
+      <button class="atab"        id="tab-rg" onclick="switchTab('rg')">REGISTER</button>
+    </div>
+    <!-- LOGIN -->
+    <div id="form-li">
+      <div class="fg"><label class="fl">USERNAME</label><input class="fi" id="li-u" type="text" placeholder="enter username" autocomplete="username" onkeydown="if(event.key==='Enter')doLogin()"/></div>
+      <div class="fg"><label class="fl">PASSWORD</label><input class="fi" id="li-p" type="password" placeholder="enter password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"/></div>
+      <div class="aerr" id="li-err"></div>
+      <button class="abtn" onclick="doLogin()">&#x27B6; &nbsp; LOGIN</button>
+      <button class="abtn abtn-ghost" onclick="enterAsGuest()">CONTINUE AS GUEST</button>
+    </div>
+    <!-- REGISTER -->
+    <div id="form-rg" style="display:none">
+      <div class="fg"><label class="fl">FULL NAME</label><input class="fi" id="rg-n" type="text" placeholder="your name"/></div>
+      <div class="fg"><label class="fl">EMAIL</label><input class="fi" id="rg-e" type="email" placeholder="email address" autocomplete="email"/></div>
+      <div class="fg"><label class="fl">USERNAME</label><input class="fi" id="rg-u" type="text" placeholder="choose username"/></div>
+      <div class="fg"><label class="fl">PASSWORD</label><input class="fi" id="rg-p" type="password" placeholder="min 6 characters" autocomplete="new-password"/></div>
+      <div class="aerr" id="rg-err"></div>
+      <div class="aok"  id="rg-ok"></div>
+      <button class="abtn" onclick="doRegister()">&#x25C8; &nbsp; CREATE ACCOUNT</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ MAIN APP ═══════════ -->
+<div id="app">
+  <header>
+    <div class="logo"><div class="lhex">&#x1F6A6;</div><div><div class="ltxt">URBAN<em>FLOW</em></div><span class="lsub">AI MOBILITY PLATFORM v3.1</span></div></div>
+    <div class="hpills">
+      <div class="pill"><div class="dot dg"></div>ONLINE</div>
+      <div class="pill"><div class="dot dy"></div><span id="hveh">&mdash;</span>&nbsp;VEHICLES</div>
+      <div class="pill"><div class="dot dr"></div><span id="hinc">&mdash;</span>&nbsp;INCIDENTS</div>
+      <div class="pill" id="stepPill" style="display:none"><div class="dot dp"></div>STEP MODE</div>
+      <div class="pill">REFRESH&nbsp;<span id="hcd" style="color:var(--accent)">3.0s</span></div>
+    </div>
+    <div class="hright">
+      <span style="font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--green);display:flex;align-items:center;gap:4px">
+        <span id="udot" style="width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 5px var(--green);animation:blink 1.5s infinite;display:inline-block"></span>
+        <span id="uname">GUEST</span>
+      </span>
+      <span>&#x1F4CD;&nbsp;<span id="hloc" style="color:var(--accent);font-size:9px">Locating...</span></span>
+      <span id="hclock">--:--:--</span>
+    </div>
+  </header>
+
+  <!-- LEFT PANEL -->
+  <div class="lp">
+
+    <!-- SAFETY MODE -->
+    <div class="ptit">SAFEST MODES OF TRAVEL</div>
+    <div class="mgrid">
+      <div class="mbtn active" data-mode="balanced" onclick="setMode(this)"><span class="mi">&#x2696;&#xFE0F;</span>BALANCED</div>
+      <div class="mbtn" data-mode="fastest"  onclick="setMode(this)"><span class="mi">&#x26A1;</span>FASTEST</div>
+      <div class="mbtn" data-mode="safest"   onclick="setMode(this)"><span class="mi">&#x1F6E1;&#xFE0F;</span>SAFEST</div>
+      <div class="mbtn" data-mode="eco"      onclick="setMode(this)"><span class="mi">&#x1F33F;</span>ECO</div>
+    </div>
+
+    <div class="sep"></div>
+    <!-- SAFETY SCORE -->
+    <div class="ptit">SAFETY SCORE</div>
+    <div class="sring">
+      <div class="rwrap">
+        <svg class="rsvg" width="88" height="88" viewBox="0 0 88 88">
+          <circle class="rbg" cx="44" cy="44" r="37"/>
+          <circle class="rfil" id="rfil" cx="44" cy="44" r="37" stroke="var(--green)" stroke-dasharray="232" stroke-dashoffset="46"/>
+        </svg>
+        <div class="rlbl"><div id="rscore" style="color:var(--green)">80</div><div class="rsub">/100</div></div>
+      </div>
+      <div id="rstat">GOOD</div>
+    </div>
+
+    <div class="sep"></div>
+    <!-- NEARBY ZONES -->
+    <div class="ptit">NEARBY TRAFFIC ZONES</div>
+    <div id="zonelist"><div style="font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--muted);padding:8px;text-align:center">Detecting location...</div></div>
+
+    <div class="sep"></div>
+    <!-- PARKING -->
+    <div class="ptit">NEAREST PARKING &#x1F17F;</div>
+    <button class="park-btn" id="parkBtn" onclick="findParking()">&#x1F17F; FIND NEARBY PARKING</button>
+    <div class="park-list" id="parklist"></div>
+
+    <div class="sep"></div>
+    <!-- STEP MODE -->
+    <div class="ptit">STEP MODE &#x1F6B6;</div>
+    <button class="step-btn" id="stepToggle" onclick="toggleStepMode()">&#x1F6B6; ACTIVATE STEP MODE</button>
+    <div class="step-panel" id="stepPanel">
+      <div class="step-counter">
+        <div class="step-num" id="stepCount">0</div>
+        <div class="step-lbl">STEPS TAKEN</div>
+        <div class="step-dist" id="stepDist">~0.0 m walked</div>
+      </div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--muted);letter-spacing:2px;margin-bottom:3px">PATH TYPE</div>
+      <div class="step-pgrid">
+        <div class="spbtn sp-active" data-sp="safest"   onclick="setStepPath(this)">&#x1F6E1; SAFEST</div>
+        <div class="spbtn"           data-sp="shortest" onclick="setStepPath(this)">&#x2197; SHORTEST</div>
+        <div class="spbtn"           data-sp="longest"  onclick="setStepPath(this)">&#x1F4CD; LONGEST</div>
+        <div class="spbtn"           data-sp="scenic"   onclick="setStepPath(this)">&#x1F33F; SCENIC</div>
+        <div class="spbtn"           data-sp="fastest"  onclick="setStepPath(this)">&#x26A1; FASTEST</div>
+        <div class="spbtn"           data-sp="avoid"    onclick="setStepPath(this)">&#x26A0; AVOID HI</div>
+      </div>
+      <div class="sep"></div>
+      <div style="font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--muted);letter-spacing:2px;margin-bottom:5px">ALERT CONTACTS</div>
+      <div class="contacts-section">
+        <div class="contact-input-wrap">
+          <input class="contact-input" id="contactInput" placeholder="Name or phone number" onkeydown="if(event.key==='Enter')addContact()"/>
+          <button class="contact-add-btn" onclick="addContact()">+ADD</button>
+        </div>
+        <div id="contactList"></div>
+        <button class="send-loc-btn" id="sendLocBtn" onclick="openSmsModal()" disabled>&#x1F4E4; SEND MY LOCATION</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- MAP -->
+  <div class="mapa">
+    <div id="locLoad"><div class="lspin">&#x25C8; ACQUIRING LOCATION &#x25C8;</div><div class="lspin2">Please allow location access</div></div>
+    <div id="map"></div>
+    <div id="destPrompt"><h3>&#x1F3AF; CLICK YOUR DESTINATION</h3><p>Tap anywhere on the map to set your destination</p></div>
+    <button id="changeDestBtn" onclick="startPickingDest()">&#x270F; CHANGE DESTINATION</button>
+    <div class="mhud">
+      <div class="hbadge">LIVE MAP &mdash; <span id="mzone">LOCATING...</span></div>
+      <div class="hbadge" id="rbadge" style="color:var(--muted)">&#x25C8; WAITING FOR DEST</div>
+    </div>
+    <div class="rbar" id="rbar" style="width:100%"></div>
+    <div class="mleg">
+      <div class="lrow"><div class="lline" style="background:var(--green)"></div>LOW RISK</div>
+      <div class="lrow"><div class="lline" style="background:var(--yellow)"></div>MODERATE</div>
+      <div class="lrow"><div class="lline" style="background:var(--red)"></div>HIGH RISK</div>
+      <div class="lrow"><div class="lline" style="background:var(--accent);height:4px"></div>ROUTE</div>
+      <div class="lrow"><div class="lline" style="background:var(--purple);height:3px;border:1px dashed var(--purple)"></div>PARKING</div>
+      <div class="lrow"><div class="lline" style="background:var(--green);height:3px;border:1px dashed var(--green)"></div>STEP PATH</div>
+    </div>
+    <div class="etab">
+      <div class="elbl">ESTIMATED ARRIVAL</div>
+      <div class="enum"><span id="etam">&mdash;</span><span> min</span></div>
+      <div class="esub" id="etar">Set a destination first</div>
+      <div class="elbl" style="margin-top:6px">DELAY SAVED</div>
+      <div class="edel" id="edel">&mdash;</div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="rp">
+    <div class="ptit">SIGNAL OPTIMIZER</div>
+    <div id="siglist"></div>
+    <div class="sep"></div>
+    <div class="ptit">AI EVENT FEED</div>
+    <div class="afd" id="afd"></div>
+    <div class="sep"></div>
+    <div class="ptit">SYSTEM CONTROLS</div>
+    <div class="crow">
+      <div class="cb on"  id="tog-ai"   onclick="toggleCtrl(this,'AI')">AI ON</div>
+      <div class="cb on"  id="tog-sync" onclick="toggleCtrl(this,'SYNC')">SYNC ON</div>
+    </div>
+    <div class="crow">
+      <div class="cb on"  id="tog-sig"  onclick="toggleCtrl(this,'SIGNALS')">SIGNALS ON</div>
+      <div class="cb off" id="tog-alt"  onclick="toggleCtrl(this,'ALERTS')">ALERTS OFF</div>
+    </div>
+    <div class="crow" style="margin-top:2px">
+      <div class="cb" style="flex:2;border-color:var(--a2);color:var(--a2)" onclick="relocate()">&#x1F4CD; RE-LOCATE</div>
+      <div class="cb" onclick="resetMap()">&#x27F3; RESET</div>
+    </div>
+    <div class="crow" style="margin-top:2px">
+      <div class="cb" style="border-color:var(--muted);color:var(--muted)" onclick="doLogout()">&#x21FA; LOGOUT</div>
+    </div>
+  </div>
+
+  <!-- TICKER -->
+  <div class="tbar">
+    <div class="tlbl">LIVE</div>
+    <div class="tsc"><div class="ttr">
+      <span><em>SYSTEM:</em> Location acquired &mdash; local zones loaded</span>
+      <span><em>AI:</em> Route optimized for current conditions</span>
+      <span><em>STEP:</em> Step mode available &mdash; tap to activate</span>
+      <span><em>PARKING:</em> Nearby spaces available</span>
+      <span><em>ALERT:</em> Congestion detected &mdash; rerouting</span>
+      <span><em>DB:</em> Backend connected &middot; User data synced</span>
+      <span><em>SYSTEM:</em> Location acquired &mdash; local zones loaded</span>
+      <span><em>AI:</em> Route optimized for current conditions</span>
+      <span><em>STEP:</em> Step mode available &mdash; tap to activate</span>
+      <span><em>PARKING:</em> Nearby spaces available</span>
+      <span><em>ALERT:</em> Congestion detected &mdash; rerouting</span>
+      <span><em>DB:</em> Backend connected &middot; User data synced</span>
+    </div></div>
+  </div>
+</div>
+
+<!-- SMS MODAL -->
+<div id="smsModal">
+  <div class="sms-box">
+    <button class="sms-close" onclick="closeSmsModal()">&#x2715;</button>
+    <div class="sms-title">&#x1F4E4; SEND LOCATION</div>
+    <div class="sms-sub">// SHARE YOUR CURRENT POSITION WITH CONTACTS</div>
+    <div class="sms-preview" id="smsPreview">Generating message...</div>
+    <div class="sms-actions">
+      <button class="sms-copy" onclick="copyMsg()">&#x1F4CB; COPY MESSAGE</button>
+      <button class="sms-wa"   onclick="openWhatsApp()">&#x1F4AC; WHATSAPP</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+'use strict';
+
+// ─────────────────────────────────────────────────────────
+// BACKEND CONFIG  →  change this to your server URL
+// ─────────────────────────────────────────────────────────
+const API = 'http://localhost:5000'; // your Express server
+
+// ─────────────────────────────────────────────────────────
+// LOCAL FALLBACK DB (localStorage)
+// used when backend unreachable — guests / offline mode
+// ─────────────────────────────────────────────────────────
+const LDB = {
+  users(){ try{return JSON.parse(localStorage.getItem('uf_users')||'[]')}catch(e){return[]} },
+  save(u){ localStorage.setItem('uf_users',JSON.stringify(u)) },
+  session(){ try{return JSON.parse(localStorage.getItem('uf_sess'))}catch(e){return null} },
+  setSession(u){ localStorage.setItem('uf_sess',JSON.stringify(u)); localStorage.setItem('uf_tok',u.token||'') },
+  clearSession(){ localStorage.removeItem('uf_sess'); localStorage.removeItem('uf_tok') },
+  tok(){ return localStorage.getItem('uf_tok')||'' },
+};
+function lhp(p){ let h=0; for(let i=0;i<p.length;i++){h=((h<<5)-h)+p.charCodeAt(i);h|=0} return h.toString(36) }
+
+// ─────────────────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────────────────
+let MAP, routeL, parkRouteL, stepRouteL;
+let zoneCircles=[], incMarkers=[], vehMarkers=[], parkMarkers=[];
+let uLat=null, uLng=null, uMark=null;
+let destLat=null, destLng=null, destMark=null;
+let pickingDest=false;
+let curMode='balanced', curZone=null;
+let rfTimer=3, rfIv=null;
+let vehicles=0, incidents=0;
+let aiOn=true, syncOn=true, sigOn=true, altOn=false;
+let curUser=null;
+let nearZones=[], parkSpots=[], selPark=null;
+
+// Step mode
+let stepActive=false, stepCount=0, stepPath='safest', stepContacts=[];
+let stepInterval=null, stepStartLat=null, stepStartLng=null;
+let smsMsg='';
+
+const MODES={
+  balanced:{score:80,eta:12,delay:'+7',col:'#00d8ff',rn:'Local Roads',ang:45},
+  fastest: {score:55,eta:9, delay:'+3', col:'#ff7b39',rn:'Expressway', ang:20},
+  safest:  {score:96,eta:18,delay:'+13',col:'#00ffaa',rn:'Safe Route', ang:130},
+  eco:     {score:88,eta:15,delay:'+10',col:'#7c3aed',rn:'Eco Lane',   ang:90},
+};
+const RLVL=['LOW','MED','HIGH'];
+const RCOL={LOW:'#00ffaa',MED:'#ffd60a',HIGH:'#ff3054'};
+const RLBL={LOW:'&#x2713; LOW RISK',MED:'&#x25C8; MODERATE RISK',HIGH:'&#x26A0; HIGH RISK'};
+const SNAMES=['Main Junction','Central Ave','Ring Road N','Highway Entry','Market Circle','Bridge Gate'];
+const AIEVTS=[
+  {t:'INCIDENT',m:'Collision detected nearby',c:'c'},
+  {t:'SIGNAL',  m:'Junction cycle extended +12s',c:'i'},
+  {t:'ROUTE',   m:'Alternate route suggested',c:'i'},
+  {t:'WEATHER', m:'Rain forecast - risk elevated',c:'w'},
+  {t:'FLOW',    m:'Corridor clear - good speed',c:'s'},
+  {t:'AI OPT',  m:'Safety score recalculated',c:'i'},
+  {t:'CROWD',   m:'High pedestrian density ahead',c:'w'},
+  {t:'SYNC',    m:'Data refreshed',c:'s'},
+  {t:'PARKING', m:'2 nearby spots freed',c:'s'},
+  {t:'STEP',    m:'Safe walking path updated',c:'s'},
+];
+
+// ─────────────────────────────────────────────────────────
+// CLOCK
+// ─────────────────────────────────────────────────────────
+setInterval(()=>{const c=document.getElementById('hclock');if(c)c.textContent=new Date().toTimeString().split(' ')[0];},1000);
+
+// ─────────────────────────────────────────────────────────
+// SPLASH PARTICLES
+// ─────────────────────────────────────────────────────────
+(function(){
+  setTimeout(()=>{const sb=document.getElementById('sbar');if(sb)sb.style.width='100%';},300);
+  const cv=document.getElementById('sparks'),cx=cv.getContext('2d');
+  const rsz=()=>{cv.width=innerWidth;cv.height=innerHeight}; rsz();
+  window.addEventListener('resize',rsz);
+  const pts=Array.from({length:80},()=>({x:Math.random()*innerWidth,y:Math.random()*innerHeight,r:.3+Math.random()*1.3,vx:(Math.random()-.5)*.35,vy:(Math.random()-.5)*.35,a:Math.random()}));
+  (function draw(){
+    cx.clearRect(0,0,cv.width,cv.height);
+    pts.forEach(p=>{
+      p.x+=p.vx; p.y+=p.vy;
+      if(p.x<0)p.x=cv.width; if(p.x>cv.width)p.x=0;
+      if(p.y<0)p.y=cv.height; if(p.y>cv.height)p.y=0;
+      p.a+=(Math.random()-.5)*.06; p.a=Math.max(.08,Math.min(1,p.a));
+      cx.beginPath(); cx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      cx.fillStyle='rgba(0,216,255,'+p.a+')'; cx.fill();
+    }); requestAnimationFrame(draw);
+  })();
+})();
+
+// ─────────────────────────────────────────────────────────
+// AUTH FLOW
+// ─────────────────────────────────────────────────────────
+function showAuth(){
+  document.getElementById('splash').classList.add('hide');
+  document.getElementById('authPage').classList.add('open');
+  clearAuthFields();
+}
+function hideAuth(){
+  document.getElementById('authPage').classList.remove('open');
+  document.getElementById('splash').classList.remove('hide');
+  document.getElementById('splash').style.opacity='1';
+  document.getElementById('splash').style.display='flex';
+}
+function switchTab(t){
+  document.getElementById('tab-li').classList.toggle('active',t==='li');
+  document.getElementById('tab-rg').classList.toggle('active',t==='rg');
+  document.getElementById('form-li').style.display=t==='li'?'':'none';
+  document.getElementById('form-rg').style.display=t==='rg'?'':'none';
+  clearAuthFields();
+}
+function clearAuthFields(){
+  ['li-u','li-p','rg-n','rg-e','rg-u','rg-p'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  setErr('li-err',''); setErr('rg-err',''); setOk('rg-ok','');
+}
+function setErr(id,m){const el=document.getElementById(id);if(el)el.textContent=m;}
+function setOk(id,m){const el=document.getElementById(id);if(el)el.textContent=m;}
+
+// Try backend login, fall back to localStorage
+async function doLogin(){
+  const u=document.getElementById('li-u').value.trim();
+  const p=document.getElementById('li-p').value;
+  if(!u||!p){setErr('li-err','All fields required');return;}
+
+  // Try real backend first
+  try{
+    const res=await fetch(API+'/api/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p})});
+    const data=await res.json();
+    if(res.ok){
+      curUser={username:data.username||u,name:data.name||u,isGuest:false,token:data.token};
+      LDB.setSession(curUser);
+      document.getElementById('authPage').classList.remove('open');
+      enterApp(); return;
+    } else { setErr('li-err',data.error||data.message||'Invalid credentials'); return; }
+  } catch(e){ /* backend offline — try local */ }
+
+  // Local fallback
+  const users=LDB.users();
+  const found=users.find(x=>x.username===u&&x.password===lhp(p));
+  if(!found){setErr('li-err','Invalid credentials (offline mode)');return;}
+  setErr('li-err','');
+  curUser={username:found.username,name:found.name,isGuest:false};
+  LDB.setSession(curUser);
+  document.getElementById('authPage').classList.remove('open');
+  enterApp();
+}
+
+async function doRegister(){
+  const n=document.getElementById('rg-n').value.trim();
+  const e=document.getElementById('rg-e').value.trim();
+  const u=document.getElementById('rg-u').value.trim();
+  const p=document.getElementById('rg-p').value;
+  if(!n||!e||!u||!p){setErr('rg-err','All fields required');return;}
+  if(p.length<6){setErr('rg-err','Password min 6 chars');return;}
+  if(!/\S+@\S+\.\S+/.test(e)){setErr('rg-err','Invalid email');return;}
+
+  // Try real backend
+  try{
+    const res=await fetch(API+'/api/auth/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:n,email:e,username:u,password:p})});
+    const data=await res.json();
+    if(res.ok){
+      setOk('rg-ok','Account created! Logging in...');
+      setTimeout(()=>{ document.getElementById('li-u').value=u; switchTab('li'); },1200);
+      return;
+    } else { setErr('rg-err',data.error||data.message||'Registration failed'); return; }
+  } catch(e2){ /* backend offline */ }
+
+  // Local fallback
+  const users=LDB.users();
+  if(users.find(x=>x.username===u)){setErr('rg-err','Username taken');return;}
+  if(users.find(x=>x.email===e)){setErr('rg-err','Email registered');return;}
+  users.push({username:u,name:n,email:e,password:lhp(p),created:new Date().toISOString()});
+  LDB.save(users);
+  setOk('rg-ok','Account saved locally! Logging in...');
+  setTimeout(()=>{ curUser={username:u,name:n,isGuest:false}; LDB.setSession(curUser); document.getElementById('authPage').classList.remove('open'); enterApp(); },1200);
+}
+
+function enterAsGuest(){
+  document.getElementById('authPage').classList.remove('open');
+  document.getElementById('splash').classList.add('hide');
+  curUser={username:'GUEST',name:'Guest',isGuest:true};
+  enterApp();
+}
+function doLogout(){
+  LDB.clearSession(); curUser=null; stopRf();
+  if(stepActive) stopStepMode();
+  document.getElementById('app').classList.remove('visible');
+  document.getElementById('app').style.opacity='0';
+  const sp=document.getElementById('splash');
+  sp.classList.remove('hide'); sp.style.opacity='1'; sp.style.display='flex';
+  showToast('Logged out');
+}
+
+// ─────────────────────────────────────────────────────────
+// ENTER APP
+// ─────────────────────────────────────────────────────────
+function enterApp(){
+  document.getElementById('app').classList.add('visible');
+  initApp();
+}
+
+// ─────────────────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────────────────
+function initApp(){
+  document.getElementById('uname').textContent=(curUser&&!curUser.isGuest)?curUser.username.toUpperCase():'GUEST';
+  initMap();
+  buildSignals();
+  updateScore(80);
+  for(let i=0;i<4;i++) pushAI();
+  vehicles=rnd(800,1500); incidents=rnd(1,6);
+  document.getElementById('hveh').textContent=vehicles.toLocaleString();
+  document.getElementById('hinc').textContent=incidents;
+  updateMetrics();
+  startRf();
+}
+
+// ─────────────────────────────────────────────────────────
+// MAP INIT & GEOLOCATION
+// ─────────────────────────────────────────────────────────
+function initMap(){
+  MAP=L.map('map',{zoomControl:false,attributionControl:false}).setView([20,0],3);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(MAP);
+  L.control.zoom({position:'topright'}).addTo(MAP);
+  MAP.on('click',onMapClick);
+  getLocation();
+}
+function getLocation(){
+  if(!navigator.geolocation){onLocFail();return;}
+  navigator.geolocation.getCurrentPosition(p=>{uLat=p.coords.latitude;uLng=p.coords.longitude;onLocOK();},onLocFail,{enableHighAccuracy:true,timeout:12000});
+}
+function onLocOK(){
+  document.getElementById('locLoad').classList.add('hide');
+  if(uMark)MAP.removeLayer(uMark);
+  const ic=L.divIcon({html:'<div style="width:16px;height:16px;background:#00ffaa;border-radius:50%;border:3px solid #fff;box-shadow:0 0 16px #00ffaa,0 0 32px rgba(0,255,170,.4)"></div>',iconSize:[16,16],iconAnchor:[8,8]});
+  uMark=L.marker([uLat,uLng],{icon:ic,zIndexOffset:1000}).addTo(MAP).bindPopup('<b>📍 Your Location</b>',{className:'uf-popup'});
+  MAP.flyTo([uLat,uLng],14,{duration:1.5});
+  fetch('https://nominatim.openstreetmap.org/reverse?lat='+uLat+'&lon='+uLng+'&format=json')
+    .then(r=>r.json()).then(d=>{
+      const city=(d.address&&(d.address.city||d.address.town||d.address.village||d.address.county))||'Your Area';
+      const cc=(d.address&&d.address.country_code&&d.address.country_code.toUpperCase())||'';
+      document.getElementById('hloc').textContent=city+(cc?', '+cc:'');
+      document.getElementById('mzone').textContent=city.toUpperCase();
+    }).catch(()=>{ document.getElementById('hloc').textContent=uLat.toFixed(3)+', '+uLng.toFixed(3); });
+  genZones();
+  placeIncidents();
+  animateVehicles();
+  // Show destination prompt
+  document.getElementById('destPrompt').style.display='block';
+  startPickingDest();
+}
+function onLocFail(){
+  document.getElementById('locLoad').classList.add('hide');
+  uLat=19.076; uLng=72.877;
+  document.getElementById('hloc').textContent='Mumbai, IN (default)';
+  showToast('Location denied — using Mumbai as default','warn');
+  onLocOK();
+}
+function relocate(){ document.getElementById('locLoad').classList.remove('hide'); getLocation(); }
+
+// ─────────────────────────────────────────────────────────
+// DESTINATION PICKING
+// ─────────────────────────────────────────────────────────
+function startPickingDest(){
+  pickingDest=true;
+  document.getElementById('map').classList.add('picking-dest');
+  document.getElementById('destPrompt').style.display='block';
+  document.getElementById('changeDestBtn').style.display='none';
+  document.getElementById('rbadge').innerHTML='&#x1F3AF; CLICK DESTINATION';
+  document.getElementById('rbadge').style.color='var(--yellow)';
+  showToast('🎯 Click anywhere on the map to set your destination','warn');
+}
+function onMapClick(e){
+  if(pickingDest){
+    setDestination(e.latlng.lat, e.latlng.lng);
+  }
+}
+function setDestination(lat,lng){
+  pickingDest=false;
+  document.getElementById('map').classList.remove('picking-dest');
+  document.getElementById('destPrompt').style.display='none';
+  document.getElementById('changeDestBtn').style.display='block';
+  destLat=lat; destLng=lng;
+  if(destMark) MAP.removeLayer(destMark);
+  const m=MODES[curMode];
+  const ic=L.divIcon({html:'<div style="width:22px;height:22px;background:'+m.col+';clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);box-shadow:0 0 14px '+m.col+';display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:bold;color:#000">B</div>',iconSize:[22,22],iconAnchor:[11,11]});
+  destMark=L.marker([destLat,destLng],{icon:ic,zIndexOffset:900}).addTo(MAP).bindPopup('<b>🏁 Your Destination</b>',{className:'uf-popup'}).openPopup();
+  drawRoute();
+  showToast('Destination set! Route calculated.','ok');
+}
+
+// ─────────────────────────────────────────────────────────
+// ROUTE DRAWING (origin → destination)
+// ─────────────────────────────────────────────────────────
+function drawRoute(){
+  if(!uLat||!destLat)return;
+  if(routeL)MAP.removeLayer(routeL);
+  if(window._sm)MAP.removeLayer(window._sm);
+  clearInterval(window._rA);
+  const m=MODES[curMode];
+
+  // Compute distance for ETA
+  const dlat=destLat-uLat, dlng=destLng-uLng;
+  const distKm=Math.hypot(dlat*111, dlng*111*Math.cos(uLat*Math.PI/180));
+
+  // Risk-based waypoint offset (safest = curves away from direct path)
+  const perpOff=curMode==='safest'?0.004:curMode==='eco'?0.002:0.001;
+  const midLat=(uLat+destLat)/2+perpOff;
+  const midLng=(uLng+destLng)/2+perpOff*.5;
+
+  routeL=L.polyline([[uLat,uLng],[midLat,midLng],[destLat,destLng]],
+    {color:m.col,weight:5,opacity:.9,dashArray:'12 6'}).addTo(MAP);
+  let doff=0;
+  window._rA=setInterval(()=>{ doff=(doff+1)%18; if(routeL._path)routeL._path.style.strokeDashoffset=-doff; },55);
+
+  // Origin marker
+  const sic=L.divIcon({html:'<div style="width:13px;height:13px;background:'+m.col+';border-radius:50%;border:2px solid #fff;box-shadow:0 0 10px '+m.col+';display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:900;color:#000">A</div>',iconSize:[13,13],iconAnchor:[6,6]});
+  window._sm=L.marker([uLat,uLng],{icon:sic,zIndexOffset:500}).addTo(MAP).bindPopup('<b>🚀 START (You)</b>',{className:'uf-popup'});
+
+  // Update dest marker color
+  if(destMark) MAP.removeLayer(destMark);
+  const dic=L.divIcon({html:'<div style="width:22px;height:22px;background:'+m.col+';clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);box-shadow:0 0 14px '+m.col+';display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:bold;color:#000">B</div>',iconSize:[22,22],iconAnchor:[11,11]});
+  destMark=L.marker([destLat,destLng],{icon:dic,zIndexOffset:900}).addTo(MAP).bindPopup('<b>🏁 Destination</b>',{className:'uf-popup'});
+
+  // ETA: speed varies by mode and congestion
+  const speedKmh={balanced:35,fastest:55,safest:25,eco:30}[curMode]||35;
+  const etaMin=Math.max(1,Math.round(distKm/speedKmh*60));
+  const baseSave={balanced:5,fastest:2,safest:10,eco:8}[curMode]||5;
+  document.getElementById('etam').textContent=etaMin;
+  document.getElementById('etar').textContent='Via '+m.rn+' \u00B7 '+distKm.toFixed(1)+'km';
+  document.getElementById('edel').textContent='+'+baseSave+' min';
+  document.getElementById('edel').style.color=curMode==='fastest'?'var(--orange)':'var(--green)';
+
+  // Risk badge based on route
+  const riskScore=curMode==='safest'?'LOW':curMode==='balanced'?'MED':'HIGH';
+  document.getElementById('rbadge').innerHTML=RLBL[riskScore];
+  document.getElementById('rbadge').style.color=RCOL[riskScore];
+
+  updateScore(MODES[curMode].score+rnd(-5,5));
+  MAP.fitBounds([[uLat,uLng],[destLat,destLng]],{padding:[60,60]});
+}
+
+// ─────────────────────────────────────────────────────────
+// ZONES
+// ─────────────────────────────────────────────────────────
+function genZones(){
+  zoneCircles.forEach(z=>MAP.removeLayer(z.circle)); zoneCircles=[]; nearZones=[];
+  const offs=[
+    {dlat:.008,dlng:.011,name:'City Centre',r:900},
+    {dlat:-.013,dlng:.016,name:'North District',r:750},
+    {dlat:.019,dlng:-.009,name:'East Corridor',r:800},
+    {dlat:-.010,dlng:-.017,name:'West Ring',r:700},
+    {dlat:.023,dlng:.021,name:'South Gateway',r:850},
+  ];
+  offs.forEach((o,i)=>{
+    const lat=uLat+o.dlat,lng=uLng+o.dlng;
+    const risk=RLVL[Math.floor(Math.random()*3)],col=RCOL[risk];
+    const zone={key:'z'+i,lat,lng,label:o.name.toUpperCase(),risk,color:col,r:o.r};
+    nearZones.push(zone);
+    const dist=(Math.hypot(o.dlat,o.dlng)*111).toFixed(1);
+    const circle=L.circle([lat,lng],{radius:o.r,color:col,fillColor:col,fillOpacity:.1,weight:2,opacity:.75}).addTo(MAP);
+    circle.bindPopup('<b>'+o.name+'</b><br>Risk: <span style="color:'+col+';font-weight:bold">'+risk+'</span><br>~'+dist+' km away',{className:'uf-popup'});
+    circle.on('click',()=>focusZone(i));
+    zoneCircles.push({key:'z'+i,circle,zone});
+  });
+  renderZones();
+}
+function renderZones(){
+  const list=document.getElementById('zonelist'); list.innerHTML='';
+  nearZones.forEach((z,i)=>{
+    const d=(Math.hypot((z.lat-uLat)*111,(z.lng-uLng)*111*Math.cos(uLat*Math.PI/180))).toFixed(1);
+    const cls={LOW:'bl',MED:'bm',HIGH:'bh'}[z.risk];
+    const div=document.createElement('div'); div.className='zitem'+(curZone===i?' sel':''); div.dataset.idx=i;
+    div.onclick=()=>focusZone(i);
+    div.innerHTML='<div><div style="font-weight:700;font-size:11px">'+z.label+'</div><div style="font-family:\'Share Tech Mono\',monospace;font-size:8px;color:var(--muted)">'+d+' km</div></div><span class="zb '+cls+'" id="zb'+i+'">'+z.risk+'</span>';
+    list.appendChild(div);
+  });
+}
+function focusZone(i){
+  document.querySelectorAll('.zitem').forEach(el=>el.classList.remove('sel'));
+  const el=document.querySelector('[data-idx="'+i+'"]'); if(el)el.classList.add('sel');
+  curZone=i; const z=nearZones[i];
+  document.getElementById('mzone').textContent=z.label;
+  MAP.flyTo([z.lat,z.lng],15,{duration:1});
+  showToast('Focused: '+z.label);
+}
+
+// ─────────────────────────────────────────────────────────
+// MODE
+// ─────────────────────────────────────────────────────────
+function setMode(el){
+  document.querySelectorAll('.mbtn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active'); curMode=el.dataset.mode;
+  updateScore(Math.min(100,Math.max(10,MODES[curMode].score+rnd(-5,5))));
+  if(destLat) drawRoute();
+  else showToast('Mode: '+curMode.toUpperCase()+' — Set a destination to see route');
+}
+function updateScore(s){
+  const off=232-(s/100)*232;
+  const c=s>=80?'var(--green)':s>=50?'var(--yellow)':'var(--red)';
+  const gl=s>=80?'#00ffaa':s>=50?'#ffd60a':'#ff3054';
+  const f=document.getElementById('rfil'),sc=document.getElementById('rscore');
+  f.style.strokeDashoffset=off; f.style.stroke=c;
+  f.closest('svg').style.filter='drop-shadow(0 0 8px '+gl+')';
+  sc.textContent=s; sc.style.color=c;
+  document.getElementById('rstat').textContent=s>=80?'EXCELLENT':s>=60?'GOOD':s>=40?'MODERATE':'CRITICAL';
+}
+
+// ─────────────────────────────────────────────────────────
+// STEP MODE
+// ─────────────────────────────────────────────────────────
+function toggleStepMode(){
+  if(!stepActive) startStepMode(); else stopStepMode();
+}
+function startStepMode(){
+  if(!uLat){showToast('Location required for step mode','warn');return;}
+  stepActive=true; stepCount=0;
+  stepStartLat=uLat; stepStartLng=uLng;
+  document.getElementById('stepToggle').classList.add('active-step');
+  document.getElementById('stepToggle').innerHTML='&#x1F534; STOP STEP MODE';
+  document.getElementById('stepPanel').classList.add('open');
+  document.getElementById('stepPill').style.display='flex';
+  document.getElementById('stepCount').textContent='0';
+  document.getElementById('stepDist').textContent='~0.0 m walked';
+  // Simulate step counting (accelerometer not available in all browsers)
+  // In real device: use DeviceMotionEvent; here we simulate
+  stepInterval=setInterval(simulateStep,900);
+  drawStepPath();
+  showToast('🚶 Step mode active! Steps being counted.','step');
+  pushAIMsg('STEP MODE','Walking route activated - stay safe!','s');
+  updateSendBtn();
+}
+function stopStepMode(){
+  stepActive=false;
+  clearInterval(stepInterval); stepInterval=null;
+  document.getElementById('stepToggle').classList.remove('active-step');
+  document.getElementById('stepToggle').innerHTML='&#x1F6B6; ACTIVATE STEP MODE';
+  document.getElementById('stepPanel').classList.remove('open');
+  document.getElementById('stepPill').style.display='none';
+  if(stepRouteL){MAP.removeLayer(stepRouteL); stepRouteL=null;}
+  showToast('Step mode ended. Steps: '+stepCount);
+}
+function simulateStep(){
+  if(!stepActive)return;
+  // Simulate realistic cadence (80-130 steps/min → ~1.3 steps/sec)
+  const newSteps=rnd(1,3); stepCount+=newSteps;
+  document.getElementById('stepCount').textContent=stepCount;
+  // Stride ~0.75m average
+  const distM=(stepCount*0.75).toFixed(0);
+  const distDisplay=distM>=1000?(distM/1000).toFixed(2)+' km':distM+' m';
+  document.getElementById('stepDist').textContent='~'+distDisplay+' walked';
+}
+function setStepPath(el){
+  document.querySelectorAll('.spbtn').forEach(b=>b.classList.remove('sp-active'));
+  el.classList.add('sp-active'); stepPath=el.dataset.sp;
+  drawStepPath();
+  showToast('Step path: '+el.textContent.trim());
+}
+function drawStepPath(){
+  if(!uLat)return;
+  if(stepRouteL){MAP.removeLayer(stepRouteL); stepRouteL=null;}
+  const pathCols={safest:'#00ffaa',shortest:'#00d8ff',longest:'#ff7b39',scenic:'#7c3aed',fastest:'#ffd60a',avoid:'#ff3054'};
+  const col=pathCols[stepPath]||'#00ffaa';
+  // Generate a path based on type
+  const angles={safest:60,shortest:45,longest:200,scenic:120,fastest:30,avoid:90};
+  const dist={safest:.008,shortest:.005,longest:.018,scenic:.012,fastest:.006,avoid:.009};
+  const ang=(angles[stepPath]||60)*Math.PI/180;
+  const d=dist[stepPath]||.008;
+  const pts=[[uLat,uLng]];
+  let curLat=uLat,curLng=uLng;
+  const segs=stepPath==='longest'?5:3;
+  for(let i=0;i<segs;i++){
+    const a=ang+i*(Math.PI/4)*(stepPath==='scenic'?1.5:1);
+    curLat+=Math.sin(a)*d*.8; curLng+=Math.cos(a)*d*.8;
+    pts.push([curLat,curLng]);
+  }
+  stepRouteL=L.polyline(pts,{color:col,weight:4,opacity:.85,dashArray:'8 5'}).addTo(MAP);
+  if(destLat==null) MAP.fitBounds(pts,{padding:[40,40]});
+}
+
+// ─────────────────────────────────────────────────────────
+// CONTACTS & SMS
+// ─────────────────────────────────────────────────────────
+function addContact(){
+  const inp=document.getElementById('contactInput');
+  const val=inp.value.trim(); if(!val)return;
+  if(stepContacts.includes(val)){showToast('Contact already added','warn');return;}
+  stepContacts.push(val);
+  inp.value='';
+  renderContacts();
+  updateSendBtn();
+  showToast('Contact added: '+val,'ok');
+}
+function removeContact(i){
+  stepContacts.splice(i,1); renderContacts(); updateSendBtn();
+}
+function renderContacts(){
+  const list=document.getElementById('contactList'); list.innerHTML='';
+  stepContacts.forEach((c,i)=>{
+    const div=document.createElement('div'); div.className='contact-tag';
+    div.innerHTML='<span>&#x1F4DE; '+c+'</span><button onclick="removeContact('+i+')">&#x2715;</button>';
+    list.appendChild(div);
+  });
+}
+function updateSendBtn(){
+  document.getElementById('sendLocBtn').disabled=stepContacts.length===0||!stepActive;
+}
+function buildSmsMsg(){
+  const now=new Date().toLocaleString();
+  const distM=(stepCount*0.75).toFixed(0);
+  const mapLink=uLat&&uLng?'https://maps.google.com/?q='+uLat+','+uLng:'[location unavailable]';
+  return 'Hi! I just wanted to let you know I am currently walking.\n\nSTEPS: '+stepCount+'\nDISTANCE: ~'+distM+'m\nMODE: '+stepPath.toUpperCase()+'\nTIME: '+now+'\n\nMY CURRENT LOCATION:\n'+mapLink+'\n\nSent via URBANFLOW Safety Mode 🚦';
+}
+function openSmsModal(){
+  if(!stepActive){showToast('Start step mode first','warn');return;}
+  smsMsg=buildSmsMsg();
+  document.getElementById('smsPreview').textContent=smsMsg;
+  document.getElementById('smsModal').classList.add('open');
+}
+function closeSmsModal(){ document.getElementById('smsModal').classList.remove('open'); }
+function copyMsg(){
+  navigator.clipboard.writeText(smsMsg).then(()=>showToast('Message copied to clipboard!','ok')).catch(()=>{
+    const ta=document.createElement('textarea'); ta.value=smsMsg; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta);
+    showToast('Message copied!','ok');
+  });
+}
+function openWhatsApp(){
+  const encoded=encodeURIComponent(smsMsg);
+  const phone=stepContacts.find(c=>/^\+?\d+$/.test(c.replace(/\s/g,'')));
+  const url=phone?'https://wa.me/'+phone.replace(/\D/g,'')+'?text='+encoded:'https://wa.me/?text='+encoded;
+  window.open(url,'_blank');
+}
+
+// ─────────────────────────────────────────────────────────
+// PARKING
+// ─────────────────────────────────────────────────────────
+function findParking(){
+  if(!uLat){showToast('Location required','warn');return;}
+  const btn=document.getElementById('parkBtn');
+  btn.disabled=true; btn.textContent='🔍 SEARCHING...';
+  parkMarkers.forEach(m=>MAP.removeLayer(m)); parkMarkers=[];
+  if(parkRouteL){MAP.removeLayer(parkRouteL);parkRouteL=null;}
+  parkSpots=[];
+  const R=0.018;
+  const q='[out:json][timeout:12];(node["amenity"="parking"]('+( uLat-R)+','+(uLng-R)+','+(uLat+R)+','+(uLng+R)+');way["amenity"="parking"]('+( uLat-R)+','+(uLng-R)+','+(uLat+R)+','+(uLng+R)+'););out center;';
+  fetch('https://overpass-api.de/api/interpreter?data='+encodeURIComponent(q))
+    .then(r=>r.json())
+    .then(d=>{
+      const els=d.elements||[];
+      if(!els.length){fallbackPark();finPark();return;}
+      parkSpots=els.slice(0,6).map((el,i)=>{
+        const lat=el.lat||(el.center&&el.center.lat);
+        const lng=el.lon||(el.center&&el.center.lon);
+        const dist=Math.hypot((lat-uLat)*111,(lng-uLng)*111*Math.cos(uLat*Math.PI/180));
+        const name=(el.tags&&(el.tags.name||el.tags['addr:street']))||'Parking '+(i+1);
+        const slots=el.tags&&el.tags.capacity?parseInt(el.tags.capacity):rnd(15,80);
+        return{name,lat,lng,dist:dist.toFixed(2),slots,free:Math.floor(slots*Math.random())};
+      }).sort((a,b)=>a.dist-b.dist);
+      renderPark(); finPark();
+    })
+    .catch(()=>{fallbackPark();finPark();});
+}
+function fallbackPark(){
+  const names=['City Parking','Metro Lot','Central Park','Mall P','Station Bay'];
+  parkSpots=[];
+  for(let i=0;i<5;i++){
+    const ang=Math.random()*Math.PI*2,r=.002+Math.random()*.012;
+    const lat=uLat+Math.sin(ang)*r,lng=uLng+Math.cos(ang)*r;
+    const dist=Math.hypot((lat-uLat)*111,(lng-uLng)*111*Math.cos(uLat*Math.PI/180));
+    const slots=rnd(10,60);
+    parkSpots.push({name:names[i],lat,lng,dist:dist.toFixed(2),slots,free:rnd(0,slots)});
+  }
+  parkSpots.sort((a,b)=>a.dist-b.dist); renderPark();
+  showToast('Parking: simulated data','warn');
+}
+function finPark(){const btn=document.getElementById('parkBtn');btn.disabled=false;btn.textContent='🅿 REFRESH PARKING';}
+function renderPark(){
+  const list=document.getElementById('parklist'); list.innerHTML='';
+  parkMarkers.forEach(m=>MAP.removeLayer(m)); parkMarkers=[];
+  selPark=null;
+  if(!parkSpots.length){list.innerHTML='<div style="font-family:\'Share Tech Mono\',monospace;font-size:9px;color:var(--muted);padding:8px;text-align:center">No parking found</div>';return;}
+  parkSpots.forEach((p,i)=>{
+    const fc=p.free>5?'var(--green)':p.free>0?'var(--yellow)':'var(--red)';
+    const ft=p.free>0?p.free+' FREE':'FULL';
+    const div=document.createElement('div'); div.className='pitem'; div.dataset.pi=i;
+    div.onclick=()=>selParking(i);
+    div.innerHTML='<div class="prow"><div class="pname">&#x1F17F; '+p.name+'</div><span style="font-family:\'Share Tech Mono\',monospace;font-size:9px;color:'+fc+';font-weight:700">'+ft+'</span></div><div class="pdist">'+p.dist+' km</div><div style="font-family:\'Share Tech Mono\',monospace;font-size:8px;color:var(--muted)">'+p.slots+' total</div>';
+    list.appendChild(div);
+    const ic=L.divIcon({html:'<div style="background:#a78bfa;color:#fff;font-family:\'Share Tech Mono\',monospace;font-size:8px;font-weight:bold;padding:2px 5px;border-radius:2px;box-shadow:0 0 10px #a78bfa;white-space:nowrap">&#x1F17F;'+(i+1)+'</div>',iconSize:[28,18],iconAnchor:[14,9]});
+    const mk=L.marker([p.lat,p.lng],{icon:ic}).addTo(MAP).bindPopup('<b>&#x1F17F; '+p.name+'</b><br>Free: <span style="color:'+fc+'">'+p.free+'/'+p.slots+'</span>',{className:'uf-popup'});
+    mk.on('click',()=>selParking(i)); parkMarkers.push(mk);
+  });
+  showToast('Found '+parkSpots.length+' parking areas','ok');
+}
+function selParking(i){
+  document.querySelectorAll('.pitem').forEach(el=>el.classList.remove('psel'));
+  const el=document.querySelector('[data-pi="'+i+'"]'); if(el)el.classList.add('psel');
+  selPark=i; const p=parkSpots[i];
+  if(parkRouteL)MAP.removeLayer(parkRouteL);
+  const wp=[uLat+(p.lat-uLat)*.5+(Math.random()-.5)*.002,uLng+(p.lng-uLng)*.5+(Math.random()-.5)*.002];
+  parkRouteL=L.polyline([[uLat,uLng],wp,[p.lat,p.lng]],{color:'#a78bfa',weight:4,opacity:.85,dashArray:'8 5'}).addTo(MAP);
+  MAP.flyTo([p.lat,p.lng],16,{duration:1});
+  const walkMin=Math.ceil(parseFloat(p.dist)/0.08);
+  showToast('P '+p.name+' — '+p.dist+'km · ~'+walkMin+'min walk · '+p.free+' free','ok');
+}
+
+// ─────────────────────────────────────────────────────────
+// INCIDENTS & VEHICLES
+// ─────────────────────────────────────────────────────────
+function placeIncidents(){
+  if(!uLat)return;
+  incMarkers.forEach(m=>MAP.removeLayer(m)); incMarkers=[];
+  for(let i=0;i<incidents&&i<5;i++){
+    const lat=uLat+(Math.random()-.5)*.04,lng=uLng+(Math.random()-.5)*.04;
+    const ic=L.divIcon({html:'<div style="font-size:20px;filter:drop-shadow(0 0 8px #ff3054)">&#x26A0;</div>',iconSize:[24,24],iconAnchor:[12,12]});
+    incMarkers.push(L.marker([lat,lng],{icon:ic}).addTo(MAP).bindPopup('<span style="color:#ff3054;font-weight:bold">&#x26A0; INCIDENT</span>',{className:'uf-popup'}));
+  }
+}
+let vspots=[];
+function animateVehicles(){
+  if(!uLat){setTimeout(animateVehicles,1000);return;}
+  vehMarkers.forEach(m=>MAP.removeLayer(m)); vehMarkers=[];
+  if(!vspots.length){
+    for(let i=0;i<6;i++){
+      const ang=Math.random()*Math.PI*2,r=.004+Math.random()*.014;
+      vspots.push({lat:uLat+Math.sin(ang)*r,lng:uLng+Math.cos(ang)*r,dlat:(Math.random()-.5)*.0003,dlng:(Math.random()-.5)*.0003});
+    }
+  }
+  vspots.forEach(v=>{
+    v.lat+=v.dlat; v.lng+=v.dlng;
+    if(Math.abs(v.lat-uLat)>.022)v.dlat*=-1;
+    if(Math.abs(v.lng-uLng)>.022)v.dlng*=-1;
+    const ic=L.divIcon({html:'<div style="width:9px;height:9px;background:#00d8ff;border-radius:50%;box-shadow:0 0 7px #00d8ff;opacity:.9"></div>',iconSize:[9,9],iconAnchor:[4,4]});
+    vehMarkers.push(L.marker([v.lat,v.lng],{icon:ic}).addTo(MAP));
+  });
+  setTimeout(animateVehicles,800);
+}
+function resetMap(){ if(!uLat)return; MAP.flyTo([uLat,uLng],14,{duration:1}); showToast('Map reset to your location'); }
+
+// ─────────────────────────────────────────────────────────
+// SIGNALS
+// ─────────────────────────────────────────────────────────
+function buildSignals(){
+  const l=document.getElementById('siglist'); l.innerHTML='';
+  SNAMES.forEach(n=>{const d=document.createElement('div'); d.className='sigrow'; d.id='sg'+n.replace(/\s/g,''); l.appendChild(d);});
+  updateSignals();
+}
+function updateSignals(){
+  SNAMES.forEach(n=>{
+    const pct=sigOn?rnd(20,100):0, sec=sigOn?rnd(12,70):0;
+    const c=pct>66?'#00ffaa':pct>33?'#ffd60a':'#ff3054';
+    const el=document.getElementById('sg'+n.replace(/\s/g,''));
+    if(el)el.innerHTML='<div class="sigl" style="background:'+c+';box-shadow:0 0 6px '+c+'"></div><div style="flex:1;min-width:0"><div style="font-size:8px;font-family:\'Share Tech Mono\',monospace;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+n+'</div><div class="sigbw"><div class="sigbf" style="width:'+pct+'%;background:'+c+'"></div></div></div><div class="sigt">'+sec+'s</div>';
+  });
+}
+
+// ─────────────────────────────────────────────────────────
+// AI FEED
+// ─────────────────────────────────────────────────────────
+function pushAI(){
+  if(!aiOn)return;
+  const ev=AIEVTS[Math.floor(Math.random()*AIEVTS.length)];
+  pushAIMsg(ev.t,ev.m,ev.c);
+}
+function pushAIMsg(t,m,c){
+  const now=new Date().toTimeString().split(' ')[0];
+  const fd=document.getElementById('afd');
+  const cm={c:'aev-c',w:'aev-w',i:'aev-i',s:'aev-s'};
+  const co={c:'var(--red)',w:'var(--yellow)',i:'var(--accent)',s:'var(--green)'};
+  const d=document.createElement('div'); d.className='aev '+cm[c];
+  d.innerHTML='<div class="aeh"><span class="aet" style="color:'+co[c]+'">'+t+'</span><span class="aets">'+now+'</span></div><div style="color:var(--text)">'+m+'</div>';
+  fd.prepend(d);
+  while(fd.children.length>14) fd.removeChild(fd.lastChild);
+  if(altOn) showToast('['+t+'] '+m);
+}
+function updateMetrics(){
+  document.getElementById('mavg')?document.getElementById('mavg').textContent=rnd(20,75):'';
+  document.getElementById('mcng')?document.getElementById('mcng').textContent=rnd(20,95)+'%':'';
+  document.getElementById('mse')?document.getElementById('mse').textContent=rnd(55,99)+'%':'';
+  document.getElementById('mfl')?document.getElementById('mfl').textContent=(1.8+Math.random()*3.5).toFixed(1)+'k':'';
+}
+
+// ─────────────────────────────────────────────────────────
+// REFRESH
+// ─────────────────────────────────────────────────────────
+function startRf(){
+  stopRf(); rfTimer=3;
+  rfIv=setInterval(()=>{
+    rfTimer-=.05;
+    document.getElementById('hcd').textContent=Math.max(0,rfTimer).toFixed(1)+'s';
+    document.getElementById('rbar').style.width=(rfTimer/3*100)+'%';
+    if(rfTimer<=0){doRf();rfTimer=3;}
+  },50);
+}
+function stopRf(){clearInterval(rfIv);}
+function doRf(){
+  if(!syncOn)return;
+  vehicles=rnd(600,1800); incidents=rnd(0,6);
+  document.getElementById('hveh').textContent=vehicles.toLocaleString();
+  document.getElementById('hinc').textContent=incidents;
+  updateMetrics();
+  nearZones.forEach((z,i)=>{
+    const r=RLVL[Math.floor(Math.random()*3)]; z.risk=r; z.color=RCOL[r];
+    const el=document.getElementById('zb'+i);
+    if(el){el.textContent=r; el.className='zb '+{LOW:'bl',MED:'bm',HIGH:'bh'}[r];}
+    const zc=zoneCircles.find(x=>x.key==='z'+i);
+    if(zc)zc.circle.setStyle({color:z.color,fillColor:z.color});
+  });
+  parkSpots.forEach(p=>{p.free=rnd(0,p.slots);});
+  if(parkSpots.length)renderPark();
+  updateScore(Math.min(100,Math.max(10,MODES[curMode].score+rnd(-8,8))));
+  updateSignals(); pushAI(); placeIncidents();
+}
+
+// ─────────────────────────────────────────────────────────
+// CONTROLS
+// ─────────────────────────────────────────────────────────
+function toggleCtrl(el,feat){
+  const on=el.classList.toggle('on'); el.classList.toggle('off',!on);
+  el.textContent=feat+(on?' ON':' OFF');
+  if(feat==='AI')aiOn=on;
+  if(feat==='SYNC'){syncOn=on; if(!on)stopRf(); else startRf();}
+  if(feat==='SIGNALS'){sigOn=on; updateSignals();}
+  if(feat==='ALERTS')altOn=on;
+  showToast(feat+': '+(on?'ENABLED':'DISABLED'));
+}
+
+// ─────────────────────────────────────────────────────────
+// TOAST
+// ─────────────────────────────────────────────────────────
+let _tt;
+function showToast(msg,type){
+  const t=document.getElementById('toast');
+  t.textContent=msg;
+  t.className='show'+(type==='warn'?' toast-warn':type==='ok'?' toast-ok':type==='step'?' toast-step':'');
+  clearTimeout(_tt); _tt=setTimeout(()=>t.classList.remove('show'),3200);
+}
+
+// ─────────────────────────────────────────────────────────
+// UTILS
+// ─────────────────────────────────────────────────────────
+const rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+
+// ─────────────────────────────────────────────────────────
+// AUTO SESSION RESTORE
+// ─────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded',()=>{
+  const ses=LDB.session();
+  if(ses){
+    curUser=ses;
+    document.getElementById('splash').classList.add('hide');
+    document.getElementById('app').classList.add('visible');
+    initApp();
+  } else {
+    setTimeout(()=>{const sb=document.getElementById('sbar');if(sb)sb.style.width='100%';},300);
+  }
+});
+</script>
+</body>
+</html>
