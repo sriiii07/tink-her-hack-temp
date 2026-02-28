@@ -2,31 +2,31 @@
   <img src="./img.png" alt="Project Banner" width="100%">
 </p>
 
-# [UrbanFlow] 🎯
+# UrbanFlow 🎯
 
 ## Basic Details
 
-### Team Name: [Debug Divas]
+### Team Name:Debug Divas
 
 ### Team Members
-- Member 1: [Eshani M] - [Ahalia School Of Engineering and Technology]
-- Member 2: [A Srilaxmi] - [Ahalia School Of Engineering and Technology]
+- Member 1: Eshani M - Ahalia School Of Engineering and Technology
+- Member 2: A Srilaxmi - Ahalia School Of Engineering and Technology
 
 ### Hosted Project Link
 [mention your project hosted link here]
 
 ### Project Description
-[Urbanflow is an AI mobility platform that helps users with all the traffic related problems including informations about the highest level of traffic, easiest route to go from current location to destination etc. It is also available with a walk mode which helps users track their steps etc, nearest parking area information, real time AI event feed which gives the latest updates about signals nearby and provide the best route possible.] 
+Urbanflow is an AI mobility platform that helps users with all the traffic related problems including informations about the highest level of traffic, easiest route to go from current location to destination etc. It is also available with a walk mode which helps users track their steps etc, nearest parking area information, real time AI event feed which gives the latest updates about signals nearby and provide the best route possible. 
 
 ### The Problem statement
-[Urban traffic inefficiency. Major problems solvedare: 
+Urban traffic inefficiency. Major problems solvedare: 
 Time wasted in traffic
 Fuel wastage
 Difficulty finding parking
-Lack of centralized traffic intelligence]
+Lack of centralized traffic intelligence
 
 ### The Solution
-[UrbanFlow provides information about real-time traffic conditions, fastest routes, nearest available parking etc which results in reduced congestion impact, reduced search time and improved traffic efficiency]
+UrbanFlow provides information about real-time traffic conditions, fastest routes, nearest available parking etc which results in reduced congestion impact, reduced search time and improved traffic efficiency
 
 ---
 
