@@ -87,14 +87,14 @@ List the key features of your project:
 
 #### Screenshots (Add at least 3)
 
-![Screenshot1](Add screenshot 1 here with proper name)
+![Screenshot1](urbanflow .png)
 **UrbanFlow** appears to be an AI-powered urban mobility platform designed to help users navigate cities more efficiently. The interface suggests features like real-time traffic monitoring, safety-optimized routing, step-by-step navigation, and a parking finder. It includes options for a live map, AI-based route optimization, and user access through login/register or guest mode. The futuristic design with traffic signal imagery and grid background emphasizes smart, intelligent traffic and navigation management.
 
 
-![Screenshot2](Add screenshot 2 here with proper name)
+![Screenshot2](login- urbanflow.png)
 The portal is currently on the "Login" tab (with a "Register" option available) and includes fields for a username and password, a primary login button, and a "Continue as Guest" option for limited access.
 
-![Screenshot3](Add screenshot 3 here with proper name)
+![Screenshot3](urbanflow- actual page.png)
 This is the actual page of the project, which functions as a comprehensive AI Mobility Platform for real-time urban management and navigation. The central interface features a Live Map that tracks active routes and vehicle positions within a specific geographic area. To support driver decision-making, the dashboard includes a Safety Score indicator and a categorized list of Traffic Zones ranked by their current risk levels. Users can customize their experience by selecting different Travel Modes, such as prioritizing speed, safety, or fuel efficiency.
 
 The right-hand side of the screen is dedicated to system intelligence, featuring a Signal Optimizer that monitors junction wait times and an AI Event Feed that provides a rolling log of automated suggestions, like route changes or signal extensions. At the top, a Status Bar provides a high-level overview of the entire network, including the number of connected vehicles and active incidents. Finally, the System Controls allow for manual overrides of the AI's functions, giving operators direct influence over traffic signals and alerts.
