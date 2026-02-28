@@ -92,7 +92,7 @@ List the key features of your project:
 
 
 ![Screenshot2](Add screenshot 2 here with proper name)
-*Add caption explaining what this shows*
+The portal is currently on the "Login" tab (with a "Register" option available) and includes fields for a username and password, a primary login button, and a "Continue as Guest" option for limited access.
 
 ![Screenshot3](Add screenshot 3 here with proper name)
 *Add caption explaining what this shows*
